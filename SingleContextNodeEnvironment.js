@@ -4,6 +4,7 @@
  */
 
 const NodeEnvironment = require("jest-environment-node");
+const vm = require('vm')
 
 /**
  * Special node environment class for Jest which runs all scripts in the same context. This effectively disables
@@ -15,9 +16,7 @@ module.exports = class extends NodeEnvironment {
 
         // Use shared global environment for all tests
         this.global = global;
-
-        // For Jest 25 this method must be removed. Overwriting it with a method which returns null doesn't work...
-        this.getVmContext = null;
+        this.context = vm.createContext(global);
 
         // Make process.exit immutable to prevent Jest adding some annoying logging output to it
         /* Disabled for now, looks like it is no longer needed?
@@ -27,9 +26,5 @@ module.exports = class extends NodeEnvironment {
             set() {}
         });
         */
-    }
-
-    runScript(script) {
-        return script.runInThisContext();
     }
 }
